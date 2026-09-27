@@ -44,6 +44,15 @@ def get_colors(num_colors: int) -> List[Tuple[int, int, int]]:
   return colors
 
 
+def _get_colormap(name: str = 'hsv'):
+  """Gets a colormap by name in a way compatible across matplotlib versions."""
+  if hasattr(matplotlib, 'colormaps'):
+    return matplotlib.colormaps[name]
+  if hasattr(matplotlib, 'cm') and hasattr(matplotlib.cm, 'get_cmap'):
+    return matplotlib.cm.get_cmap(name)
+  return plt.get_cmap(name)
+
+
 def paint_point_track(
     frames: np.ndarray,
     point_tracks: np.ndarray,
@@ -132,6 +141,7 @@ def plot_tracks_v2(
     gt_occluded: Optional[np.ndarray] = None,
     trackgroup: Optional[np.ndarray] = None,
     point_size: int = 20,
+    point_color: Optional[np.ndarray] = None,
 ) -> np.ndarray:
   """Plot tracks with matplotlib.
 
@@ -156,21 +166,35 @@ def plot_tracks_v2(
       the same color.  Useful for clustering applications.
     point_size: int, the size of the plotted points, passed as the 's' parameter
       to matplotlib.
+    point_color: Optional point colors of shape [num_points, 3] or
+      [num_points, 4] (RGB or RGBA), float or uint8. If provided, overrides
+      the colormap.
 
   Returns:
     video: [num_frames, height, width, 3], np.uint8, [0, 255]
   """
   disp = []
-  cmap = plt.cm.hsv  # pytype: disable=module-attr
+  cmap = _get_colormap('hsv')
 
-  z_list = (
-      np.arange(points.shape[0]) if trackgroup is None else np.array(trackgroup)
-  )
+  if point_color is not None:
+    colors = np.array(point_color, dtype=np.float32)
+    if np.max(colors) > 1.0:
+      colors = colors / 255.0
+    if colors.shape[-1] == 3:
+      colors = np.concatenate(
+          [colors, np.ones((colors.shape[0], 1), dtype=np.float32)], axis=-1
+      )
+  else:
+    z_list = (
+        np.arange(points.shape[0])
+        if trackgroup is None
+        else np.array(trackgroup)
+    )
 
-  # random permutation of the colors so nearby points in the list can get
-  # different colors
-  z_list = np.random.permutation(np.max(z_list) + 1)[z_list]
-  colors = cmap(z_list / (np.max(z_list) + 1))
+    # random permutation of the colors so nearby points in the list can get
+    # different colors
+    z_list = np.random.permutation(np.max(z_list) + 1)[z_list]
+    colors = cmap(z_list / (np.max(z_list) + 1))
   figure_dpi = 64
 
   for i in range(rgb.shape[0]):
@@ -198,7 +222,7 @@ def plot_tracks_v2(
       gt_points = np.maximum(gt_points, 0.0)
       gt_points = np.minimum(gt_points, [rgb.shape[2], rgb.shape[1]])
       colalpha = np.concatenate(
-          [colors[:, :-1], 1 - gt_occluded[:, i : i + 1]], axis=1
+          [colors[:, :-1], 1 - gt_occluded[:, i : i + 1]], axis=1  # pyrefly: ignore[unsupported-operation]
       )
       colalpha = np.clip(colalpha, 0, 1)
 
@@ -362,14 +386,14 @@ def compute_inliers(
   """Compute inliers and errors."""
   if src_pts_homog is None:
     src_pts_homog = jnp.transpose(
-        jnp.concatenate([src_pts, src_pts[:, 0:1] * 0 + 1], axis=-1)
+        jnp.concatenate([src_pts, src_pts[:, 0:1] * 0 + 1], axis=-1)  # pyrefly: ignore[bad-argument-type, unsupported-operation]
     )
   tformed = jnp.transpose(jnp.matmul(homog, src_pts_homog))
   tformed = tformed[..., :-1] / (
       jnp.maximum(1e-12, jnp.abs(tformed[..., -1:]))
       * jnp.sign(tformed[..., -1:])
   )
-  err = jnp.sum(jnp.square(targ_pts - tformed), axis=-1)
+  err = jnp.sum(jnp.square(targ_pts - tformed), axis=-1)  # pyrefly: ignore[unsupported-operation]
   new_inliers = err < thresh * thresh
   return new_inliers, err, tformed
 
@@ -673,7 +697,7 @@ def plot_tracks_tails(
     frames: rgb frames with rendered rainbow tracks.
   """
   disp = []
-  cmap = plt.cm.hsv  # pytype: disable=module-attr
+  cmap = _get_colormap('hsv')
 
   z_list = np.arange(points.shape[0])
 

@@ -167,6 +167,7 @@ BootsTAPIR|[Jax](https://storage.googleapis.com/dm-tapnet/bootstap/bootstapir_ch
 Online BootsTAPIR|[Jax](https://storage.googleapis.com/dm-tapnet/bootstap/causal_bootstapir_checkpoint.npy) & [PyTorch](https://storage.googleapis.com/dm-tapnet/bootstap/causal_bootstapir_checkpoint.pt)|[tapir_bootstrap_config.py](https://github.com/google-deepmind/tapnet/blob/main/configs/tapir_bootstrap_config.py)|ResNet18 + 4 Convs|256x256 + 512x512|59.7%|61.2%|55.1%|69.1%
 TAPNext|[Jax](https://storage.googleapis.com/dm-tapnet/tapnext/bootstapnext_ckpt.npz)|[tapnext_demo.ipynb](https://github.com/google-deepmind/tapnet/blob/main/colabs/tapnext_demo.ipynb)|TrecViT-B|256x256|65.25%|68.9%|57.3%|64.1%
 TAPNext++|[PyTorch](https://storage.googleapis.com/dm-tapnet/tapnextpp/tapnextpp_ckpt.pt)|[torch_tapnextpp_demo.ipynb](https://colab.research.google.com/github/deepmind/tapnet/blob/main/colabs/torch_tapnextpp_demo.ipynb)|TrecViT-B|256x256|65.6%|-|53.9%|61.1%
+TAPNext++ (512×512)|[PyTorch](https://storage.googleapis.com/gresearch/tapnextpp/tapnextpp_512.ckpt)|[VOTSp2026 README](https://github.com/google-deepmind/tapnet/blob/main/tapnet/tapnextpp/votsp2026/README.md)|TrecViT-B|512x512|67.0%|71.2%|-|-
 TRAJAN|[Jax](https://storage.googleapis.com/dm-tapnet/trajan/track_autoencoder_ckpt.npz)|[trajan_demo.ipynb](https://github.com/google-deepmind/tapnet/blob/main/colabs/trajan_demo.ipynb)
 
 ## Training
@@ -242,13 +243,15 @@ Please use the following bibtex entries to cite our work:
 
 ## License and Disclaimer
 
-Copyright 2022-2024 Google LLC
+Copyright 2022-2026 Google LLC
 
 Software and other materials specific to the TAPVid-3D benchmark are covered by the license outlined in tapvid3d/LICENSE file.
 
 All other software in this repository is licensed under the Apache License, Version 2.0 (Apache 2.0); you may not use this file except in compliance with the Apache 2.0 license. You may obtain a copy of the Apache 2.0 license at:
 
 https://www.apache.org/licenses/LICENSE-2.0
+
+All pre-trained model checkpoints released in this repository and linked from this README (including TAP-Net, TAPIR, BootsTAPIR, TAPNext, TAPNext++, and TRAJAN weights) are also licensed under Apache 2.0.
 
 All other non-software materials released here for the TAP-Vid datasets, i.e. the TAP-Vid annotations, as well as the RGB-Stacking videos and RoboTAP videos, are released under a [Creative Commons BY license](https://creativecommons.org/licenses/by/4.0/). You may obtain a copy of the CC-BY license at:
 https://creativecommons.org/licenses/by/4.0/legalcode .
